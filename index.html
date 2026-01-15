@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasbih APP</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Tasbih Counter</h1>
+            <p class="subtitle">Remembrance & Spiritual Counter</p>
+            <button id="themeToggle" class="theme-toggle" title="Toggle Theme">🌙</button>
+        </header>
+
+        <!-- Main Counter Display -->
+        <div class="main-counter-section">
+            <div class="counter-display">
+                <div class="current-count" id="countDisplay">0</div>
+                <div class="counter-label">Current Count</div>
+            </div>
+
+            <!-- Progress Circle -->
+            <div class="progress-circle-container">
+                <svg class="progress-circle" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" class="progress-bg"></circle>
+                    <circle cx="50" cy="50" r="45" class="progress-fill" id="progressFill"></circle>
+                </svg>
+                <div class="progress-text" id="progressText">0%</div>
+            </div>
+        </div>
+
+        <!-- Counter Type Selection -->
+        <div class="counter-types">
+            <button class="counter-type-btn active" data-type="tasbih">
+                <span class="type-icon">📿</span>
+                <span class="type-name">Tasbih Counter</span>
+            </button>
+            <button class="counter-type-btn" data-type="mantra">
+                <span class="type-icon">🕉️</span>
+                <span class="type-name">Mantra Counter</span>
+            </button>
+        </div>
+
+        <!-- Main Large Counter Button -->
+        <div class="counter-button-section">
+            <button id="counterBtn" class="counter-btn" title="Click or press Space to count">
+                <span class="button-inner">TAP TO COUNT</span>
+                <span class="button-icon">📿</span>
+            </button>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="controls">
+            <button id="minusBtn" class="control-btn minus-btn" title="Minus 1">
+                <span>➖</span>
+            </button>
+            <button id="refreshBtn" class="control-btn refresh-btn" title="Refresh/Reset">
+                <span>🔄</span>
+            </button>
+            <button id="plusBtn" class="control-btn plus-btn" title="Plus 1">
+                <span>➕</span>
+            </button>
+        </div>
+
+        <!-- Customization Settings -->
+        <div class="settings-section">
+            <div class="setting-item">
+                <label for="targetCount">Target Count (per Tasbih):</label>
+                <input type="number" id="targetCount" min="10" max="500" value="100">
+            </div>
+            <div class="setting-item checkbox">
+                <input type="checkbox" id="soundToggle" checked>
+                <label for="soundToggle">Enable Sound</label>
+            </div>
+            <div class="setting-item checkbox">
+                <input type="checkbox" id="vibrationToggle" checked>
+                <label for="vibrationToggle">Enable Vibration</label>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-label">Cycles Completed</div>
+                <div class="stat-value" id="cyclesCompleted">0</div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div id="notification" class="notification"></div>
+
+        <!-- Reset All Data -->
+        <div class="reset-section">
+            <button id="resetAllBtn" class="reset-all-btn" title="Reset all data">
+                🗑️ Reset All Data
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Developed by <strong>Nahid Tushar</strong></p>
+            <p class="footer-note">May your remembrance bring peace to your heart.</p>
+        </footer>
+    </div>
+
+    <!-- Sound Effects (using Web Audio API) -->
+    <script>
+        // Audio context for sound effects
+        window.audioContext = null;
+        function initAudio() {
+            if (!window.audioContext) {
+                window.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Function to play beep sound
+        function playBeep(frequency = 800, duration = 100) {
+            if (!document.getElementById('soundToggle').checked) return;
+            
+            try {
+                initAudio();
+                const oscillator = window.audioContext.createOscillator();
+                const gainNode = window.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(window.audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, window.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, window.audioContext.currentTime + duration / 1000);
+                
+                oscillator.start(window.audioContext.currentTime);
+                oscillator.stop(window.audioContext.currentTime + duration / 1000);
+            } catch (e) {
+                console.log('Audio playback unavailable');
+            }
+        }
+
+        // Function for special sound (goal achieved)
+        function playSpecialSound() {
+            if (!document.getElementById('soundToggle').checked) return;
+            
+            try {
+                initAudio();
+                const frequencies = [523, 659, 784, 1047];
+                frequencies.forEach((freq, index) => {
+                    setTimeout(() => playBeep(freq, 150), index * 100);
+                });
+            } catch (e) {
+                console.log('Audio playback unavailable');
+            }
+        }
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>
